@@ -1,0 +1,15 @@
+Package: MEAD
+Type: Package
+Title: Measurement adjusted deconvolution
+Version: 0.1.0
+Author: Dongyue Xie
+Maintainer: Dongyue Xie <dyxie@uchicago.edu>
+Description: Perform estimation and inference for cell type deconvolution problem.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.1.2
