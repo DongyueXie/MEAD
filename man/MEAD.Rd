@@ -2,7 +2,7 @@
 % Please edit documentation in R/MEAD.R
 \name{MEAD}
 \alias{MEAD}
-\title{Preprocess bulk and reference datasets}
+\title{Main function performing MEAD}
 \usage{
 MEAD(
   bulk,
@@ -10,7 +10,6 @@ MEAD(
   cell_types = NULL,
   preprocessing_control = list(),
   estimation_control = list(),
-  verbose = FALSE,
   R01 = NULL
 )
 }
@@ -24,6 +23,8 @@ MEAD(
 \item{preprocessing_control}{a list of control parameters passed to MEAD_preprocessing}
 
 \item{estimation_control}{a list of control parameters passed to MEAD_est}
+
+\item{R01}{A 0-1 correlation matrix, from get_R01() function.}
 }
 \value{
 a list of:
@@ -32,5 +33,5 @@ a list of:
  *p_group_diff_hat: estimated two group means different if groups labels are provided.(levels(as.factor(groups)))
 }
 \description{
-Preprocess bulk and reference datasets
+Main function performing MEAD
 }

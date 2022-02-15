@@ -15,6 +15,8 @@ get_R01 = function(X,alpha=0.1){
   p = nrow(X)
   n = ncol(X)
 
+  genes = rownames(X)
+
   X = apply(X,2,function(z){z/sum(z)*1e6})
 
 
@@ -62,8 +64,9 @@ get_R01 = function(X,alpha=0.1){
     cor.idx = NULL
   }
 
-  R01 = sparseMatrix(i=cor.idx[,1],j=cor.idx[,2],dims=c(G,G))
+  R01 = sparseMatrix(i=cor.idx[,1],j=cor.idx[,2],dims=c(p,p))
   diag(R01) = 1
+  rownames(R01) = genes
 
   return(R01)
 

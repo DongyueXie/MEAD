@@ -15,9 +15,9 @@ You can install the package from
 [GitHub](https://github.com/DongyueXie/MEAD) with:
 
 ``` r
-#install.packages('devtools')
-#devtools::install_github('DongyueXie/MEAD')
-#library(MEAD)
+install.packages('devtools')
+devtools::install_github('DongyueXie/MEAD')
+library(MEAD)
 ```
 
 ## Tutorial

@@ -1,5 +1,5 @@
 ---
-title: "MEAD tutorial"
+title: "MEAD"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{MEAD}
@@ -18,9 +18,47 @@ We give a tutorial on how to use MEAD in this vignette.
 
 ## Install the package
 
-```{r setup}
-#install.packages('devtools')
-#devtools::install_github('DongyueXie/MEAD')
-#library(MEAD)
+```{r setup,eval=FALSE}
+install.packages('devtools')
+devtools::install_github('DongyueXie/MEAD')
+library(MEAD)
 ```
 
+
+## Load data
+
+Neuron dataset from [Jerber et al. (2021)](https://www.nature.com/articles/s41588-021-00801-6). We selected 6 individuals as reference and bulk samples are obtained by aggregating single cell data.
+
+```{r}
+ref = readRDS('ref.rds')
+bulk = readRDS('bulk.rds')
+```
+
+## Run analysis
+
+Run MEAD
+
+```{r}
+# R01 = get_R01(bulk,alpha=0.1)
+# To get R01, uncomment the above line and comment out the next line.
+R01 = readRDS('R01.rds')
+fit = MEAD(bulk[,1:10],ref,R01=R01)
+```
+
+Estimated cell type proportions.
+
+```{r}
+t(fit$p_hat)
+```
+
+Standard errors of estimated cell type proportions.
+
+```{r}
+t(fit$p_hat_se)
+```
+
+Construct confidence intervals of proportions.
+
+```{r}
+get_ci(fit)
+```

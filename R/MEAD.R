@@ -1,12 +1,13 @@
 
 
 
-#' Preprocess bulk and reference datasets
+#' Main function performing MEAD
 #'@param bulk bulk samples to be deconvolved. A count matrix, whose rownames are gene names and colnames are individual names.
 #'@param ref reference dataset, a SingleCellExperiment object, with phenotype: cell_type, individual
 #'@param cell_types cell types to be used in the deconvolution. If NULL, will use the cell types in the ref dataset.
 #'@param preprocessing_control a list of control parameters passed to MEAD_preprocessing
 #'@param estimation_control a list of control parameters passed to MEAD_est
+#'@param R01 A 0-1 correlation matrix, from get_R01() function.
 #'@return a list of:
 #'  *p_hat: estimated cell type proportions
 #'  *p_hat_se: standard errors of p_hat
@@ -19,10 +20,9 @@ MEAD = function(bulk,
                 cell_types=NULL,
                 preprocessing_control = list(),
                 estimation_control = list(),
-                verbose=FALSE,
                 R01 = NULL){
 
-  pre_control = preprocessing_control_default
+  pre_control = preprocessing_control_default()
   pre_control = modifyList(pre_control,preprocessing_control,keep.null = TRUE)
   datax = MEAD_preprocessing(bulk,
                              ref,
@@ -31,19 +31,20 @@ MEAD = function(bulk,
                              gene_thresh=pre_control$gene_thresh,
                              max_count_quantile_celltype=pre_control$max_count_quantile_celltype,
                              max_count_quantile_indi = pre_control$max_count_quantile_indi,
-                             filter.gene=pre_control$filter.gene)
+                             filter.gene=pre_control$filter.gene,
+                             R01=R01)
 
   ref_mat = MEAD_getX(datax$ref,
                       datax$cell_types,
                       datax$individuals)
 
-  est_control = est_control_default
+  est_control = est_control_default()
   est_control = modifyList(est_control,estimation_control,keep.null = TRUE)
   res = MEAD_est(datax$bulk,
                 ref_mat$X,
                 ref_mat$V,
                 ref_mat$w,
-                R01=R01,
+                R01=datax$R01,
                 hc.type=est_control$hc.type,
                 centeringXY = est_control$centeringXY,
                 nfold=est_control$nfold,
@@ -89,7 +90,7 @@ get_ci = function(mead.out,alpha = 0.05){
   ci_r[is.na(ci_r)] = 1
   ci_l = pmax(ci_l,0)
   ci_r = pmin(ci_r,1)
-  return(list(ci_l = ci_l,ci_r=ci_r))
+  return(list(ci_l = t(ci_l),ci_r=t(ci_r)))
 }
 
 

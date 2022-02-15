@@ -24,10 +24,10 @@ MEAD performs estimation and inference on cell type proportions in deconvolving 
 
 You can install the package from [GitHub](https://github.com/DongyueXie/MEAD) with:
 
-``` r
-#install.packages('devtools')
-#devtools::install_github('DongyueXie/MEAD')
-#library(MEAD)
+```{r,eval=FALSE}
+install.packages('devtools')
+devtools::install_github('DongyueXie/MEAD')
+library(MEAD)
 ```
 
 ## Tutorial

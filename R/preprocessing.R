@@ -34,6 +34,7 @@ MEAD_getX = function(ref,cell_types,individuals){
 
   fit.vash = vash(sqrt(rowSums(V)),df=NI-1)
   w = 1/(fit.vash$sd.post)^2
+  w = w/sum(w)
   names(w) = rownames(ref)
 
   return(list(X=X,V=V,w=w))
@@ -47,7 +48,7 @@ MEAD_getX = function(ref,cell_types,individuals){
 #'@param bulk bulk samples to be deconvolved. A count matrix, whose rownames are gene names and colnames are individual names.
 #'@param ref reference dataset, a SingleCellExperiment object, with phenotype: cell_type, individual
 #'@param cell_types cell types to be used in the deconvolution. If NULL, will use the cell types in the ref dataset.
-#'@param gene_thresh a fraction. Remove genes that have expression in less than (gene_thresh * #cells) cells(less than 5% of total cells by default)
+#'@param gene_thresh a fraction. Remove genes that have expression in less than (gene_thresh * total numberof cells) cells.
 #'@param marker_gene marker genes to use if any. Default is NULL.
 #'@param max_count_quantile_celltype a fraction. Remove union of genes that expressed more than max_count_quantile_celltype in each cell type.
 #'@param max_count_quantile_indi a fraction. Remove union of genes that expressed more than max_count_quantile_indi in each individual.
@@ -65,7 +66,8 @@ MEAD_preprocessing = function(bulk,ref,
                               gene_thresh=0.05,
                               max_count_quantile_celltype=0.99,
                               max_count_quantile_indi = 0.99,
-                              filter.gene=TRUE){
+                              filter.gene=TRUE,
+                              R01 = NULL){
 
   # remove cells without expression
   rm.cell = which(colSums(counts(ref))==0)
@@ -120,7 +122,7 @@ MEAD_preprocessing = function(bulk,ref,
 
         cell_k_idx = which(ref$cell_type==cell_types[k])
         if(length(cell_k_idx)!=0){
-          gene_counts = rowSums(ref[,cell_k_idx])
+          gene_counts = rowSums(counts(ref[,cell_k_idx]))
           rm.gene.high = c(rm.gene.high,which(gene_counts>quantile(gene_counts,max_count_quantile_celltype)))
         }
 
@@ -138,7 +140,7 @@ MEAD_preprocessing = function(bulk,ref,
 
         indi_j_idx = which(ref$individual==individuals[j])
         if(length(indi_j_idx)!=0){
-          gene_counts = rowSums(ref[,indi_j_idx])
+          gene_counts = rowSums(counts(ref[,indi_j_idx]))
           rm.gene.indi = c(rm.gene.indi,which(gene_counts>quantile(gene_counts,max_count_quantile_indi)))
         }
 
@@ -149,6 +151,7 @@ MEAD_preprocessing = function(bulk,ref,
     }
 
     # find ref genes to use
+
     if(length(rm.gene)!=0){
       gene_ref = rownames(ref)[-rm.gene]
     }
@@ -157,7 +160,17 @@ MEAD_preprocessing = function(bulk,ref,
     message('Filtering ref genes recommended')
   }
 
-  genes = intersect(rownames(bulk),gene_ref)
+  if(!is.null(R01)){
+    if(is.null(rownames(R01))){
+      stop('gene names must be provided for R01 matrix')
+    }
+    gene_R01 = rownames(R01)
+    genes = intersect(intersect(rownames(bulk),gene_ref),gene_R01)
+  }else{
+    genes = intersect(rownames(bulk),gene_ref)
+  }
+
+
   if(!is.null(marker_gene)){
     genes = intersect(genes,marker_gene)
   }
@@ -165,10 +178,13 @@ MEAD_preprocessing = function(bulk,ref,
     stop('No common genes found. Check gene names.')
   }
 
+
+
   return(list(bulk = bulk[match(genes,rownames(bulk)),],
               ref = ref[match(genes,rownames(ref)),],
               cell_types = cell_types,
-              individuals = individuals))
+              individuals = individuals,
+              R01 = R01[match(genes,rownames(R01)),match(genes,rownames(R01))]))
 
 }
 

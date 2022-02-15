@@ -217,9 +217,9 @@ get_SIGMA = function(y,X,beta,V,h,nb,G,K,hc.type,nfold,folds,R01){
     }
 
     if(hc.type=='cv'){
-      res.hc = get_cv_res(y,X,V,nfold=nfold,folds=folds)
+      res.hc = get_cv_res(y,X,V,folds=folds)
     }else if(hc.type=='cv_indep'){
-      res.hc = get_cv_res_indep(y,X,V,nfold=nfold,folds=folds,R01=R01)
+      res.hc = get_cv_res_indep(y,X,V,folds=folds,R01=R01)
     }
 
   }else{
