@@ -22,4 +22,5 @@ library(MEAD)
 
 ## Tutorial
 
-See the [vignette](vignettes/MEAD.html) for an example.
+See the [vignette](https://dongyuexie.github.io/MEAD/docs/MEAD.html) for
+an example.
