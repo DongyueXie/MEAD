@@ -21,7 +21,9 @@ MEAD_est = function(y,X,Vg,
                     R01=NULL,
                     groups=NULL,
                     calc_var=TRUE,
-                    use.QP = FALSE
+                    use.QP = FALSE,
+                    lambda = NULL,
+                    beta_tilde_transformation = list(method='truncate', a = 10)
 ){
 
   G = nrow(X)
@@ -64,7 +66,10 @@ MEAD_est = function(y,X,Vg,
   # if(verbose){
   #   message("estimating proportions")
   # }
-  Q = (A-V)
+  if(is.null(lambda)){
+    lambda = 1.0
+  }
+  Q = (A-lambda*V)
 
   Qinv = solve(Q)
 
@@ -77,7 +82,13 @@ MEAD_est = function(y,X,Vg,
     }
 
   }else{
-    beta_tilde_hat = pmax(Qinv%*%t(Xw)%*%yw,0)
+    if(beta_tilde_transformation$method=='truncate'){
+      beta_tilde_hat = pmax(Qinv%*%t(Xw)%*%yw,0)
+    }
+    if(beta_tilde_transformation$method=='softplus'){
+      beta_tilde_hat = log1pexp_a(Qinv%*%t(Xw)%*%yw,beta_tilde_transformation$a)
+    }
+
   }
 
 
@@ -118,7 +129,18 @@ MEAD_est = function(y,X,Vg,
       J[((i-1)*K+1):(i*K),((i-1)*K+1):(i*K)] = J_sum2one(beta_tilde_hat[,i],K)
     }
 
-    asyV = (J)%*%covb%*%t(J)
+    if(beta_tilde_transformation$method=='truncate'){
+      asyV = (J)%*%covb%*%t(J)
+    }
+    if(beta_tilde_transformation$method=='softplus'){
+      J_s = matrix(0,nrow=(nb*K),ncol=(nb*K))
+      for(i in 1:nb){
+        J_s[((i-1)*K+1):(i*K),((i-1)*K+1):(i*K)] = J_softplus(beta_tilde_hat[,i],beta_tilde_transformation$a)
+      }
+      asyV = (J)%*%J_s%*%covb%*%t(J_s)%*%t(J)
+    }
+
+
 
     p_hat = apply(beta_tilde_hat,2,function(z){z/sum(z)})
     p_hat_se = sqrt(diag(asyV))
@@ -140,7 +162,12 @@ MEAD_est = function(y,X,Vg,
 
     return(list(p_hat=p_hat,
                 p_hat_se=p_hat_se,
-                p_group_diff_hat=two_group_res
+                p_group_diff_hat=two_group_res,
+                all_res = list(
+                  beta_tilde_hat=beta_tilde_hat,
+                  J=J,
+                  beta_raw = Qinv%*%t(Xw)%*%yw
+                )
     ))
 
   }else{
@@ -171,6 +198,14 @@ J_sum2one = function(b,K){
   diag(J) = diag(J) + sum(b)
   J = J/sum(b)^2
   J
+}
+
+#'@title Jacobian matrix of softplus scale function
+#'@param b beta_hat
+#'@param a control param
+#'@return Jacobian matrix
+J_softplus = function(b,a){
+  diag(1/(1+exp(-a*c(b))))
 }
 
 
@@ -355,3 +390,11 @@ get_cv_res_indep = function(y,X,V,folds=NULL,R01=NULL){
   res
 
 }
+
+log1pexp_a <- function(x, a) {
+  result <- ifelse(x > 0,
+                   x + log1p(exp(-a * x)) / a,
+                   log1p(exp(a * x)) / a)
+  return(result)
+}
+

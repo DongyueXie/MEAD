@@ -25,7 +25,7 @@ MEAD_preprocessing(
 
 \item{cell_types}{cell types to be used in the deconvolution. If NULL, will use the cell types in the ref dataset.}
 
-\item{gene_thresh}{a fraction. Remove genes that have expression in less than (gene_thresh * total numberof cells) cells.}
+\item{gene_thresh}{a fraction. Remove genes that have expression in less than (gene_thresh * total number of cells) cells.}
 
 \item{max_count_quantile_celltype}{a fraction. Remove union of genes that expressed more than max_count_quantile_celltype in each cell type.}
 

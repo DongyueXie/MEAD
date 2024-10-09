@@ -48,7 +48,7 @@ MEAD_getX = function(ref,cell_types,individuals){
 #'@param bulk bulk samples to be deconvolved. A count matrix, whose rownames are gene names and colnames are individual names.
 #'@param ref reference dataset, a SingleCellExperiment object, with phenotype: cell_type, individual
 #'@param cell_types cell types to be used in the deconvolution. If NULL, will use the cell types in the ref dataset.
-#'@param gene_thresh a fraction. Remove genes that have expression in less than (gene_thresh * total numberof cells) cells.
+#'@param gene_thresh a fraction. Remove genes that have expression in less than (gene_thresh * total number of cells) cells.
 #'@param marker_gene marker genes to use if any. Default is NULL.
 #'@param max_count_quantile_celltype a fraction. Remove union of genes that expressed more than max_count_quantile_celltype in each cell type.
 #'@param max_count_quantile_indi a fraction. Remove union of genes that expressed more than max_count_quantile_indi in each individual.

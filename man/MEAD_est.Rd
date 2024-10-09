@@ -16,7 +16,9 @@ MEAD_est(
   R01 = NULL,
   groups = NULL,
   calc_var = TRUE,
-  use.QP = FALSE
+  use.QP = FALSE,
+  lambda = NULL,
+  beta_tilde_transformation = list(method = "truncate", a = 10)
 )
 }
 \arguments{
